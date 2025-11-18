@@ -13,10 +13,8 @@ test:
     - echo "Установка зависимостей..."
     - pip install -e .
     - pip install -r requirements.txt
-    
     - echo "Запуск тестов..."
     - python -m pytest tests/ -v
-    
     - echo "Проверка импортов..."
     - python -c "from calculator.core import Calculator; print('Импорты работают')"
   only:
@@ -31,25 +29,23 @@ build:
     - apt-get install -y build-essential debhelper python3-all python3-tk
   script:
     - echo "Создание DEB пакета..."
-    
     - mkdir -p debian
     - echo "13" > debian/compat
-    
-    - cat > debian/control << EOF
-Source: $PROJECT_NAME
-Section: utils
-Priority: optional
-Maintainer: Calculator Team <ci@example.com>
-Build-Depends: debhelper-compat (= 13), python3-all
-Standards-Version: 4.6.0
+    - |
+      cat > debian/control << 'EOF'
+      Source: $PROJECT_NAME
+      Section: utils
+      Priority: optional
+      Maintainer: Calculator Team <carielflore@gmail.com.com>
+      Build-Depends: debhelper-compat (= 13), python3-all
+      Standards-Version: 4.6.0
 
-Package: $PROJECT_NAME
-Architecture: all
-Depends: python3, python3-tk
-Description: Calculator with GUI
- Simple calculator with basic functions.
-EOF
-
+      Package: $PROJECT_NAME
+      Architecture: all
+      Depends: python3, python3-tk
+      Description: Calculator with GUI
+       Simple calculator with basic functions.
+      EOF
     - dpkg-buildpackage -us -uc -b
     - echo "DEB пакет создан"
   artifacts:
@@ -67,7 +63,6 @@ deploy:
     - echo "Установка приложения в тестовую среду CI..."
     - DEB_FILE=$(find .. -name "*.deb" | head -1)
     - dpkg -i $DEB_FILE || (apt-get install -f -y && dpkg -i $DEB_FILE)
-    
     - echo "Проверка установки..."
     - which calculator-gui && echo "Приложение установлено в CI среду!"
     - calculator-gui --help || echo "GUI приложение готово к запуску в тестовой среде"
