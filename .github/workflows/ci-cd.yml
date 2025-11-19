@@ -61,8 +61,11 @@ jobs:
         run: |
           echo "Создание DEB пакета..."
           mkdir -p debian
+
+          # compat
           echo "13" > debian/compat
 
+          # control
           printf '%s\n' \
             'Source: calculator-app' \
             'Section: utils' \
@@ -77,6 +80,21 @@ jobs:
             'Description: Calculator with GUI' \
             ' Simple calculator with basic functions.' \
             > debian/control
+
+          # changelog
+          printf '%s\n' \
+            'calculator-app (0.1.0-1) unstable; urgency=medium' \
+            '' \
+            '  * Initial release.' \
+            '' \
+            ' -- Calculator Team <carielflore@gmail.com>  Wed, 19 Nov 2025 10:00:00 +0300' \
+            > debian/changelog
+
+          # rules
+          printf '%b\n' \
+            '#!/usr/bin/make -f\n%:\n\tdh $@' \
+            > debian/rules
+          chmod +x debian/rules
 
           dpkg-buildpackage -us -uc -b
           echo "DEB пакет создан"
