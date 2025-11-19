@@ -62,7 +62,7 @@ jobs:
           echo "Создание DEB пакета..."
           mkdir -p debian
 
-          # debian/control — compat через debhelper-compat и pybuild-зависимости
+          # debian/control — debhelper-compat + pybuild-зависимости
           printf '%s\n' \
             'Source: calculator-app' \
             'Section: utils' \
@@ -87,7 +87,7 @@ jobs:
             ' -- Calculator Team <carielflore@gmail.com>  Wed, 19 Nov 2025 10:00:00 +0300' \
             > debian/changelog
 
-          # debian/rules — используем dh + pybuild
+          # debian/rules — стандартный dh + pybuild
           printf '%b\n' \
             '#!/usr/bin/make -f' \
             'export PYBUILD_NAME=calculator' \
@@ -96,14 +96,19 @@ jobs:
             > debian/rules
           chmod +x debian/rules
 
+          # Сборка пакета
           dpkg-buildpackage -us -uc -b
           echo "DEB пакет создан"
+
+          # Перенос .deb в подкаталог для upload-artifact (без использования ..)
+          mkdir -p artifacts
+          mv ../*.deb artifacts/
 
       - name: Upload DEB artifact
         uses: actions/upload-artifact@v4
         with:
           name: calculator-deb-package
-          path: ../*.deb
+          path: artifacts/*.deb
           retention-days: 30
 
   deploy:
