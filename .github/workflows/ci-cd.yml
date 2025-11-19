@@ -62,7 +62,7 @@ jobs:
           echo "Создание DEB пакета..."
           mkdir -p debian
 
-          # debian/control — бинарный пакет python3-calculator
+          # debian/control
           printf '%s\n' \
             'Source: calculator-app' \
             'Section: utils' \
@@ -78,7 +78,7 @@ jobs:
             ' Simple calculator with basic functions.' \
             > debian/control
 
-          # debian/changelog — минимальный changelog
+          # debian/changelog
           printf '%s\n' \
             'calculator-app (0.1.0-1) unstable; urgency=medium' \
             '' \
@@ -95,11 +95,9 @@ jobs:
             > debian/rules
           chmod +x debian/rules
 
-          # Сборка пакета
           dpkg-buildpackage -us -uc -b
           echo "DEB пакет создан"
 
-          # Перенос .deb в подкаталог для upload-artifact (без использования ..)
           mkdir -p artifacts
           mv ../*.deb artifacts/
 
@@ -129,4 +127,3 @@ jobs:
           echo "Проверка установки..."
           which calculator-gui && echo "Приложение установлено в CI среду!"
           calculator-gui --help || echo "GUI приложение готово к запуску в тестовой среде"
-  
