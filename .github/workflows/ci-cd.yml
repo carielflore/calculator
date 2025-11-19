@@ -55,20 +55,20 @@ jobs:
         run: |
           echo "Установка системных зависимостей..."
           sudo apt-get update
-          sudo apt-get install -y build-essential debhelper python3-all python3-tk
+          sudo apt-get install -y build-essential debhelper python3-all python3-tk dh-python
 
       - name: Build DEB package
         run: |
           echo "Создание DEB пакета..."
           mkdir -p debian
 
-          # control
+          # debian/control — compat через debhelper-compat и pybuild-зависимости
           printf '%s\n' \
             'Source: calculator-app' \
             'Section: utils' \
             'Priority: optional' \
             'Maintainer: Calculator Team <carielflore@gmail.com>' \
-            'Build-Depends: debhelper-compat (= 13), python3-all' \
+            'Build-Depends: debhelper-compat (= 13), dh-python, python3-all' \
             'Standards-Version: 4.6.0' \
             '' \
             'Package: calculator-app' \
@@ -78,7 +78,7 @@ jobs:
             ' Simple calculator with basic functions.' \
             > debian/control
 
-          # changelog
+          # debian/changelog — минимальный changelog
           printf '%s\n' \
             'calculator-app (0.1.0-1) unstable; urgency=medium' \
             '' \
@@ -87,9 +87,12 @@ jobs:
             ' -- Calculator Team <carielflore@gmail.com>  Wed, 19 Nov 2025 10:00:00 +0300' \
             > debian/changelog
 
-          # rules
+          # debian/rules — используем dh + pybuild
           printf '%b\n' \
-            '#!/usr/bin/make -f\n%:\n\tdh $@' \
+            '#!/usr/bin/make -f' \
+            'export PYBUILD_NAME=calculator' \
+            '%:' \
+            '\tdh $@ --with python3 --buildsystem=pybuild' \
             > debian/rules
           chmod +x debian/rules
 
