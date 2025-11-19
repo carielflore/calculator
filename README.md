@@ -1,3 +1,27 @@
-# CI/CD Pipeline & Git Workflow Implementation
+# Calculator App
 
-A DevOps project focused on mastering modern CI/CD practices and Git collaboration workflows through practical implementation of a Python calculator application.
+Scientific Calculator with GUI built in Python using Tkinter
+
+![Calculator Screenshot](docs/image.png)  
+
+## Features
+
+- **Basic arithmetic**: `+`, `-`, `*`, `/`
+- **Advanced operations**: `%`, `^`, `√`, `sin`, `cos`
+- **Floor and Ceil**
+- **Graphical User Interface (GUI)**
+- **Cross-platform** (Windows, macOS, Linux)
+
+## Installation
+From source
+```bash
+git clone https://github.com/carielflore/calculator.git
+cd calculator
+pip install -e .
+```
+
+## Usage
+Launch GUI
+```bash
+calculator-gui
+```
