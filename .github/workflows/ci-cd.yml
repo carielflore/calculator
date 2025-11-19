@@ -71,7 +71,7 @@ jobs:
             'Build-Depends: debhelper-compat (= 13), dh-python, python3-all' \
             'Standards-Version: 4.6.0' \
             '' \
-            'Package: python3-calculator' \
+            'Package: calculator-app' \
             'Architecture: all' \
             'Depends: ${python3:Depends}, python3-tk' \
             'Description: Calculator with GUI' \
@@ -87,12 +87,11 @@ jobs:
             ' -- Calculator Team <carielflore@gmail.com>  Wed, 19 Nov 2025 10:00:00 +0300' \
             > debian/changelog
 
-          # debian/rules — стандартный dh + pybuild
+          # debian/rules
           printf '%b\n' \
             '#!/usr/bin/make -f' \
-            'export PYBUILD_NAME=calculator' \
             '%:' \
-            '\tdh $@ --with python3 --buildsystem=pybuild' \
+            '\tdh $@ --with python3' \
             > debian/rules
           chmod +x debian/rules
 
