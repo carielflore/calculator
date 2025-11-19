@@ -12,98 +12,98 @@ jobs:
     strategy:
       matrix:
         python-version: [3.9]
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-    
-    - name: Install dependencies
-      run: |
-        echo "Установка зависимостей..."
-        pip install -e .
-        pip install -r requirements.txt
-    
-    - name: Run tests
-      run: |
-        echo "Запуск тестов..."
-        python -m pytest tests/ -v
-    
-    - name: Check imports
-      run: |
-        echo "Проверка импортов..."
-        python -c "from calculator.core import Calculator; print('Импорты работают')"
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          echo "Установка зависимостей..."
+          pip install -e .
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: |
+          echo "Запуск тестов..."
+          python -m pytest tests/ -v
+
+      - name: Check imports
+        run: |
+          echo "Проверка импортов..."
+          python -c "from calculator.core import Calculator; print('Импорты работают')"
 
   build:
     runs-on: ubuntu-latest
     needs: test
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
-    
-    - name: Install system dependencies
-      run: |
-        echo "Установка системных зависимостей..."
-        sudo apt-get update
-        sudo apt-get install -y build-essential debhelper python3-all python3-tk
-    
-    - name: Build DEB package
-      run: |
-        echo "Создание DEB пакета..."
-        mkdir -p debian
-        echo "13" > debian/compat
-        
-        cat > debian/control << 'EOF'
-Source: calculator-app
-Section: utils
-Priority: optional
-Maintainer: Calculator Team <carielflore@gmail.com>
-Build-Depends: debhelper-compat (= 13), python3-all
-Standards-Version: 4.6.0
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-Package: calculator-app
-Architecture: all
-Depends: python3, python3-tk
-Description: Calculator with GUI
- Simple calculator with basic functions.
-EOF
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
 
-        dpkg-buildpackage -us -uc -b
-        echo "DEB пакет создан"
-    
-    - name: Upload DEB artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: calculator-deb-package
-        path: ../*.deb
-        retention-days: 30
+      - name: Install system dependencies
+        run: |
+          echo "Установка системных зависимостей..."
+          sudo apt-get update
+          sudo apt-get install -y build-essential debhelper python3-all python3-tk
+
+      - name: Build DEB package
+        run: |
+          echo "Создание DEB пакета..."
+          mkdir -p debian
+          echo "13" > debian/compat
+
+          printf '%s\n' \
+            'Source: calculator-app' \
+            'Section: utils' \
+            'Priority: optional' \
+            'Maintainer: Calculator Team <carielflore@gmail.com>' \
+            'Build-Depends: debhelper-compat (= 13), python3-all' \
+            'Standards-Version: 4.6.0' \
+            '' \
+            'Package: calculator-app' \
+            'Architecture: all' \
+            'Depends: python3, python3-tk' \
+            'Description: Calculator with GUI' \
+            ' Simple calculator with basic functions.' \
+            > debian/control
+
+          dpkg-buildpackage -us -uc -b
+          echo "DEB пакет создан"
+
+      - name: Upload DEB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: calculator-deb-package
+          path: ../*.deb
+          retention-days: 30
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
-    
+
     steps:
-    - name: Download DEB artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: calculator-deb-package
-    
-    - name: Install application
-      run: |
-        echo "Установка приложения в тестовую среду CI..."
-        DEB_FILE=$(find . -name "*.deb" | head -1)
-        sudo dpkg -i $DEB_FILE || (sudo apt-get install -f -y && sudo dpkg -i $DEB_FILE)
-        
-        echo "Проверка установки..."
-        which calculator-gui && echo "Приложение установлено в CI среду!"
-        calculator-gui --help || echo "GUI приложение готово к запуску в тестовой среде"
+      - name: Download DEB artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: calculator-deb-package
+
+      - name: Install application
+        run: |
+          echo "Установка приложения в тестовую среду CI..."
+          DEB_FILE=$(find . -name "*.deb" | head -1)
+          sudo dpkg -i "$DEB_FILE" || (sudo apt-get install -f -y && sudo dpkg -i "$DEB_FILE")
+
+          echo "Проверка установки..."
+          which calculator-gui && echo "Приложение установлено в CI среду!"
+          calculator-gui --help || echo "GUI приложение готово к запуску в тестовой среде"
