@@ -62,9 +62,6 @@ jobs:
           echo "Создание DEB пакета..."
           mkdir -p debian
 
-          # compat
-          echo "13" > debian/compat
-
           # control
           printf '%s\n' \
             'Source: calculator-app' \
