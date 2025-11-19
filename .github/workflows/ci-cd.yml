@@ -71,7 +71,7 @@ jobs:
             'Build-Depends: debhelper-compat (= 13), dh-python, python3-all' \
             'Standards-Version: 4.6.0' \
             '' \
-            'Package: calculator-app' \
+            'Package: python3-calculator' \
             'Architecture: all' \
             'Depends: ${python3:Depends}, python3-tk' \
             'Description: Calculator with GUI' \
@@ -91,7 +91,7 @@ jobs:
           printf '%b\n' \
             '#!/usr/bin/make -f' \
             '%:' \
-            '\tdh $@ --with python3' \
+            '\tdh $@ --with python3 --buildsystem=pybuild' \
             > debian/rules
           chmod +x debian/rules
 
@@ -129,3 +129,4 @@ jobs:
           echo "Проверка установки..."
           which calculator-gui && echo "Приложение установлено в CI среду!"
           calculator-gui --help || echo "GUI приложение готово к запуску в тестовой среде"
+  
